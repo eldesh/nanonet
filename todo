@@ -1,0 +1,5 @@
+TODO:
+- add error abstraction layer
+-- remove using WSAGetLastError directly
+- clearly specify license is NewBSD
+
