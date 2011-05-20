@@ -44,7 +44,7 @@ void copy_buffer(buffer src, buffer * dst) {
 	dst->used += src.used;
 }
 void copy_slice_to_buffer(buffer_slice src, buffer * dst) {
-	int i;
+	size_t i;
 	for (i=0; i<src.size; ++i)
 		dst->buffer[dst->used+i] = src.buffer[i];
 	dst->used += src.size;
