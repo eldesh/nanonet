@@ -1,4 +1,6 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <net/state.h>
 
 
@@ -56,6 +58,58 @@ void copy_slice_to_buffer(buffer_slice src, buffer * dst) {
 	for (i=0; i<src.size; ++i)
 		dst->buffer[dst->used+i] = src.buffer[i];
 	dst->used += src.size;
+}
+
+int recv_buffer(socket_t sock, buffer * buff, int flags) {
+	int len=recv(sock, &buff->buffer[buff->used], buff->size-buff->used, flags);
+	if (0<len)
+		buff->used += len;
+	return len;
+}
+
+bool state_machine_service(socket_t sock, service_type start_service) {
+	buffer buff = make_buffer(0);
+	service_type service = start_service;
+	char const * pos = buff.buffer;
+	if (sock==INVALID_SOCKET)
+		return false;
+	do {
+		size_t const req_buffer_size = 512;
+		size_t const consumed = pos - buff.buffer;
+		int len;
+		buffer newbuff = make_buffer(req_buffer_size+buff.used-consumed);
+		copy_slice_to_buffer(make_buffer_slice(buff.buffer+consumed, buff.used-consumed), &newbuff);
+		delete_buffer(&buff);
+		buff = newbuff;
+//		buff.buffer = (byte*)realloc(buff.buffer, (req_buffer_size+buff.used-consumed));
+		pos = buff.buffer;
+		len=recv_buffer(sock, &buff, 0);
+		if (len==0) { // connection have been gracefully closed
+			return false;
+		} else if (len<0) {
+			fprintf(stderr, "recv failed <%d>\n", WSAGetLastError());
+			return false;
+		} else {
+			st_service_tuple st = service(buff, &pos);
+			if (st.state==ST_VALID) {
+				// ?
+				assert(false);
+			} else if (st.state==ST_SHORT) {
+				// next loop
+				pos = buff.buffer;
+			} else if (st.state==ST_TRANSITION) {
+				service = st.service;
+			} else if (st.state==ST_END) {
+				return false;
+			} else if (st.state==ST_INVALID) {
+				fprintf(stderr, "invalid state\n");
+				return false;
+			} else {
+				fprintf(stderr, "state machine occured fatal error with transition to unknown state XD\n");
+				assert(false);
+			}
+		}
+	} while (1);
 }
 
 

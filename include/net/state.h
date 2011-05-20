@@ -40,5 +40,7 @@ buffer_slice make_buffer_slice(byte const * buffer, size_t size);
 void delete_buffer(buffer * buff);
 void copy_buffer(buffer src, buffer * dst);
 void copy_slice_to_buffer(buffer_slice src, buffer * dst);
+int recv_buffer(socket_t sock, buffer * buff, int flags);
+bool state_machine_service(socket_t sock, service_type start_service);
 
 #endif    /* SERVICE_STATE_MACHINE_INCLUDED */
