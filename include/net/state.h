@@ -4,7 +4,7 @@
 #include <net/net.h>
 
 typedef enum {
-	  ST_VALID       // óvÇÁÇÒÇ©Ç‡ÅH
+	  ST_VALID       // 
 	, ST_TRANSITION  // occur transition go to other state
 	, ST_END         // state machine is end
 	, ST_INVALID     // invalid state
@@ -26,7 +26,7 @@ typedef struct buffer_slice_ {
 struct st_service_tuple_;
 typedef struct st_service_tuple_ st_service_tuple;
 
-// arg2ÇÕbuffer_sliceÇ…ÇµÇΩÇŸÇ§Ç™ÇÊÇ≥Ç∞ÅH
+// buffer_slice is better for arg2 ?
 typedef st_service_tuple (*service_type)(buffer, byte const **);
 
 struct st_service_tuple_ {
