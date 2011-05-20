@@ -251,4 +251,25 @@ uint16_t host_to_net_uint16_t(uint16_t x) {
 	return htons(x);
 }
 
+socket_t single_accept(socket_t sock, bool (*serv)(socket_t)) {
+	bool r;
+	if (sock==INVALID_SOCKET)
+		return sock;
+	do {
+		struct sockaddr_in addr;
+		int len=sizeof(addr);
+		socket_t acc=accept(sock, (struct sockaddr*)&addr, &len);
+		if (acc==INVALID_SOCKET) {
+			fprintf(stderr, "accept failed <%d>\n", WSAGetLastError());
+		} else {
+			char * hostport = getnameinfo_as_string((struct sockaddr const*)&addr, len);
+			printf("accept [%s] <- [%s:%d]\n", hostport
+				         , inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+			free(hostport);
+			r=serv(acc);
+		}
+		close_socket_t(acc);
+	} while (r); // end if serv is fail
+	return sock;
+}
 

@@ -93,5 +93,7 @@ uint16_t host_to_net_uint16_t(uint16_t x);
 
 fd_set make_fd_set(void);
 
+socket_t single_accept(socket_t sock, bool (*serv)(socket_t));
+
 #endif    /* NETWORK_INCLUDED */
 
