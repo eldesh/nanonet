@@ -1,6 +1,14 @@
 #include <stdlib.h>
 #include <net/state.h>
 
+
+#if !defined _WIN32
+static int WSAGetLastError(void) {
+	return errno;
+}
+#endif
+
+
 st_service_tuple make_st_service(SERVICE_ST_TYPE st, service_type serv) {
 	st_service_tuple sts;
 	sts.state = st;

@@ -31,7 +31,7 @@ static char const * winsock_init_err_tostring(int err) {
 #endif
 
 #if !defined _WIN32
-int WSAGetLastError(void) {
+static int WSAGetLastError(void) {
 	return errno;
 }
 #endif
@@ -226,4 +226,5 @@ uint32_t host_to_net_uint32_t(uint32_t x) {
 uint16_t host_to_net_uint16_t(uint16_t x) {
 	return htons(x);
 }
+
 
