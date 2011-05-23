@@ -28,8 +28,7 @@
 #include <net/net.h>
 
 typedef enum {
-	  ST_VALID       // 
-	, ST_TRANSITION  // occur transition go to other state
+	  ST_TRANSITION  // occur transition go to other state
 	, ST_END         // state machine is end
 	, ST_INVALID     // invalid state
 	, ST_SHORT       // given buffer is too short for parsing
