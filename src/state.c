@@ -94,33 +94,30 @@ int recv_buffer(socket_t sock, buffer * buff, int flags) {
 bool state_machine_service(socket_t sock, service_type start_service) {
 	buffer buff = make_buffer(0);
 	service_type service = start_service;
-	char const * pos = buff.buffer;
+	buffer_slice bs = make_buffer_slice(buff.buffer, buff.used);
 	if (sock==INVALID_SOCKET)
 		return false;
-	do {
+	while (1) {
 		size_t const req_buffer_size = 512;
-		size_t const consumed = pos - buff.buffer;
 		int len;
-		buffer newbuff = make_buffer(req_buffer_size+buff.used-consumed);
-		copy_slice_to_buffer(make_buffer_slice(buff.buffer+consumed, buff.used-consumed), &newbuff);
+		buffer newbuff = make_buffer(req_buffer_size+bs.size);
+		copy_slice_to_buffer(bs, &newbuff);
 		delete_buffer(&buff);
 		buff = newbuff;
-//		buff.buffer = (byte*)realloc(buff.buffer, (req_buffer_size+buff.used-consumed));
-		pos = buff.buffer;
 		len=recv_buffer(sock, &buff, 0);
+
 		if (len==0) { // connection have been gracefully closed
 			return false;
 		} else if (len<0) {
 			fprintf(stderr, "recv failed <%d>\n", WSAGetLastError());
 			return false;
 		} else {
-			st_service_tuple st = service(buff, &pos);
-			if (st.state==ST_VALID) {
-				// ?
-				assert(false);
-			} else if (st.state==ST_SHORT) {
+			st_service_tuple st;
+			bs = make_buffer_slice(buff.buffer, buff.used);
+			st = service(&bs);
+			if (st.state==ST_SHORT) {
 				// next loop
-				pos = buff.buffer;
+				bs = make_buffer_slice(buff.buffer, buff.used);
 			} else if (st.state==ST_TRANSITION) {
 				service = st.service;
 			} else if (st.state==ST_END) {
@@ -133,7 +130,7 @@ bool state_machine_service(socket_t sock, service_type start_service) {
 				assert(false);
 			}
 		}
-	} while (1);
+	}
 }
 
 
