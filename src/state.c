@@ -105,14 +105,14 @@ bool state_machine_service(socket_t sock, service_type start_service
 		int len;
 		/* expand buffer */
 		// oldbuff
-		// [                         allocated                         ]
-		// [        received                     |  indeterminate      ]
-		// [ used(consumed by service) | nonused |                     ]
+		// [                         allocated                    ]
+		// [        received                     |  indeterminate ]
+		// [ used(consumed by service) | nonused |                ]
 		// 
 		// newbuff
-		// [                         oldbuffer-size                    | nonused ]
-		// [                         allocated                                   ]
-		// [ nonused(copied from oldbuf) |                                       ] <- expanded buffer!
+		// [                         oldbuffer-size               | nonused ]
+		// [                         allocated                              ]
+		// [ nonused(copied from oldbuf) |                                  ] <- expanded buffer!
 		// 
 		buffer newbuff = make_buffer(req_buffer_size+bs.size);
 		copy_slice_to_buffer(bs, &newbuff);
