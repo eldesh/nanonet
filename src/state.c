@@ -105,13 +105,13 @@ bool state_machine_service(socket_t sock, service_type start_service) {
 		copy_slice_to_buffer(bs, &newbuff);
 		delete_buffer(&buff);
 		buff = newbuff;
-		len=recv_buffer(sock, &buff, 0);
 
+		len=recv_buffer(sock, &buff, 0);
 		if (len==0) { // connection have been gracefully closed
-			return false;
+			break;
 		} else if (len<0) {
 			fprintf(stderr, "recv failed <%d>\n", WSAGetLastError());
-			return false;
+			break;
 		} else {
 			st_service_tuple st;
 			bs = make_buffer_slice(buff.buffer, buff.used);
@@ -121,16 +121,18 @@ bool state_machine_service(socket_t sock, service_type start_service) {
 			} else if (st.state==ST_TRANSITION) {
 				service = st.service;
 			} else if (st.state==ST_END) {
-				return false;
+				break;
 			} else if (st.state==ST_INVALID) {
 				fprintf(stderr, "invalid state\n");
-				return false;
+				break;
 			} else {
 				fprintf(stderr, "state machine occured fatal error with transition to unknown state XD\n");
 				assert(false);
 			}
 		}
 	}
+	delete_buffer(&buff);
+	return false;
 }
 
 
