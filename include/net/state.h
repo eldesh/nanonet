@@ -63,7 +63,8 @@ struct st_service_tuple_ {
 // start from *start_service* state.
 // destruct context(with ctx_dtor) at the end.
 bool state_machine_service(socket_t sock, service_type start_service
-						                , void * (*ctx_ctor)(void)    // if NULL then default ctx be NULL
+						                , void * ctx                  // if NULL then start_service take a pointer to NULL
+//						                , void * (*ctx_ctor)(va_list) // if NULL then default ctx be NULL
 										, void (*ctx_dtor)(void *));  // if NULL then use free(3) instead of this
 
 st_service_tuple make_st_service(SERVICE_ST_TYPE st, service_type serv);
