@@ -49,8 +49,9 @@ typedef struct buffer_slice_ {
 struct st_service_tuple_;
 typedef struct st_service_tuple_ st_service_tuple;
 
-// buffer_slice is better for arg2 ?
-typedef st_service_tuple (*service_type)(buffer_slice *);
+// take a context of it's state machine and a pointer to inputted sequence.
+// the type of context is dependent on the state machine.
+typedef st_service_tuple (*service_type)(void ** ctx, buffer_slice *);
 
 struct st_service_tuple_ {
 	SERVICE_ST_TYPE state;  //

@@ -95,6 +95,7 @@ bool state_machine_service(socket_t sock, service_type start_service) {
 	buffer buff = make_buffer(0);
 	service_type service = start_service;
 	buffer_slice bs = make_buffer_slice(buff.buffer, buff.used);
+	void * ctx=NULL; // context of service
 	if (sock==INVALID_SOCKET)
 		return false;
 	while (1) {
@@ -114,9 +115,8 @@ bool state_machine_service(socket_t sock, service_type start_service) {
 		} else {
 			st_service_tuple st;
 			bs = make_buffer_slice(buff.buffer, buff.used);
-			st = service(&bs);
-			if (st.state==ST_SHORT) {
-				// next loop
+			st = service(&ctx, &bs);
+			if (st.state==ST_SHORT) {	// not enough inputted sequence
 				bs = make_buffer_slice(buff.buffer, buff.used);
 			} else if (st.state==ST_TRANSITION) {
 				service = st.service;
