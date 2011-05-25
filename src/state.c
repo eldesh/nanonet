@@ -101,6 +101,17 @@ bool state_machine_service(socket_t sock, service_type start_service) {
 	while (1) {
 		size_t const req_buffer_size = 512;
 		int len;
+		/* expand buffer */
+		// oldbuff
+		// [                         allocated                         ]
+		// [        received                     |  indeterminate      ]
+		// [ used(consumed by service) | nonused |                     ]
+		// 
+		// newbuff
+		// [                         oldbuffer-size                    | nonused ]
+		// [                         allocated                                   ]
+		// [ nonused(copied from oldbuf) |                                       ] <- expanded buffer!
+		// 
 		buffer newbuff = make_buffer(req_buffer_size+bs.size);
 		copy_slice_to_buffer(bs, &newbuff);
 		delete_buffer(&buff);
