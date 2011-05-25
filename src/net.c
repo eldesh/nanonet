@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <assert.h>
 
 #include <net/net.h>
@@ -249,6 +250,33 @@ uint32_t host_to_net_uint32_t(uint32_t x) {
 }
 uint16_t host_to_net_uint16_t(uint16_t x) {
 	return htons(x);
+}
+
+socket_t vsingle_accept(socket_t sock, bool (*serv)(socket_t, va_list), ...) {
+	bool r;
+	if (sock==INVALID_SOCKET)
+		return sock;
+	do {
+		struct sockaddr_in addr;
+		int len=sizeof(addr);
+		socket_t acc=accept(sock, (struct sockaddr*)&addr, &len);
+		if (acc==INVALID_SOCKET) {
+			fprintf(stderr, "accept failed <%d>\n", WSAGetLastError());
+		} else {
+			char * hostport = getnameinfo_as_string((struct sockaddr const*)&addr, len);
+			printf("accept [%s] <- [%s:%d]\n", hostport
+				         , inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+			free(hostport);
+			{
+				va_list ap;
+				va_start(ap, serv);
+				r=serv(acc, ap);
+				va_end(ap);
+			}
+		}
+		close_socket_t(acc);
+	} while (r); // end if serv is fail
+	return sock;
 }
 
 socket_t single_accept(socket_t sock, bool (*serv)(socket_t)) {

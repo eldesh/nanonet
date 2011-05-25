@@ -47,6 +47,7 @@
   typedef int    socket_t;
 #  define INVALID_SOCKET  (socket_t)(~0)
 #endif
+#include <stdarg.h>
 #include "bool.h"
 
 #if defined _WIN32
@@ -93,7 +94,8 @@ uint16_t host_to_net_uint16_t(uint16_t x);
 
 fd_set make_fd_set(void);
 
-socket_t single_accept(socket_t sock, bool (*serv)(socket_t));
+socket_t  single_accept(socket_t sock, bool (*serv)(socket_t));
+socket_t vsingle_accept(socket_t sock, bool (*serv)(socket_t, va_list), ...);
 
 #endif    /* NETWORK_INCLUDED */
 
