@@ -91,11 +91,14 @@ int recv_buffer(socket_t sock, buffer * buff, int flags) {
 	return len;
 }
 
-bool state_machine_service(socket_t sock, service_type start_service) {
+bool state_machine_service(socket_t sock, service_type start_service
+						                , void * (*ctx_ctor)(void)
+										, void (*ctx_dtor)(void *))
+{
 	buffer buff = make_buffer(0);
 	service_type service = start_service;
 	buffer_slice bs = make_buffer_slice(buff.buffer, buff.used);
-	void * ctx=NULL; // context of service
+	void * ctx=ctx_ctor ? ctx_ctor() : NULL; // construct context of service
 	if (sock==INVALID_SOCKET)
 		return false;
 	while (1) {
@@ -142,6 +145,7 @@ bool state_machine_service(socket_t sock, service_type start_service) {
 			}
 		}
 	}
+	(ctx_dtor ? ctx_dtor : free)(ctx);
 	delete_buffer(&buff);
 	return false;
 }

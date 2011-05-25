@@ -58,6 +58,14 @@ struct st_service_tuple_ {
 	service_type service;   // if st<>ST_TRANSITION then service is null
 };
 
+// run state machine.
+// construct default context(with ctx_ctor) for state machine and
+// start from *start_service* state.
+// destruct context(with ctx_dtor) at the end.
+bool state_machine_service(socket_t sock, service_type start_service
+						                , void * (*ctx_ctor)(void)    // if NULL then default ctx be NULL
+										, void (*ctx_dtor)(void *));  // if NULL then use free(3) instead of this
+
 st_service_tuple make_st_service(SERVICE_ST_TYPE st, service_type serv);
 buffer make_buffer(int size);
 buffer_slice make_buffer_slice(byte const * buffer, size_t size);
@@ -65,6 +73,5 @@ void delete_buffer(buffer * buff);
 void copy_buffer(buffer src, buffer * dst);
 void copy_slice_to_buffer(buffer_slice src, buffer * dst);
 int recv_buffer(socket_t sock, buffer * buff, int flags);
-bool state_machine_service(socket_t sock, service_type start_service);
 
 #endif    /* SERVICE_STATE_MACHINE_INCLUDED */
