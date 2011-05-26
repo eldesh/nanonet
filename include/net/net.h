@@ -66,6 +66,9 @@
 bool network_init(void); // initialize network subsystem
 void network_end(void);  // end network subsystem
 
+int nanonet_error (void); // return error number of last called network system API
+char const * nanonet_error_tostring (int err); // to string value of nanonet_error()
+
 struct addrinfo make_hint(int family, int type, int protocol);
 // addrinfo ctor from host/port presented by c-string
 struct addrinfo * make_addrinfo(char const * host, char const * port);

@@ -31,42 +31,20 @@
 
 #include <net/net.h>
 
-#if defined _WIN32
-static char const * winsock_init_err_tostring(int err) {
-	switch(err) {
-	case 0:
-		return "success!"; // not an error
-	case WSASYSNOTREADY:
-		return "WSASYSNOTREADY";
-	case WSAVERNOTSUPPORTED:
-		return "WSAVERNOTSUPPORTED";
-	case WSAEINPROGRESS:
-		return "WSAEINPROGRESS";
-	case WSAEPROCLIM:
-		return "WSAEPROCLIM";
-	case WSAEFAULT:
-		return "WSAEFAULT";
-	default:
-		assert(false);
-		break;
-	}
-	assert(false);
-	return "";
+char const * nanonet_error_tostring (int err) {
+	return strerror(err);
 }
-#endif
 
-#if !defined _WIN32
-static int WSAGetLastError(void) {
+int nanonet_error (void) {
 	return errno;
 }
-#endif
 
 bool network_init(void) {
 #if defined _WIN32
 	WSADATA wsaData;
 	int r=WSAStartup(MAKEWORD(2,0), &wsaData);
 	if (r) {
-		fprintf(stderr, "%s failure <%s>\n", __FUNCTION__, winsock_init_err_tostring(r));
+		fprintf(stderr, "%s failure <%s>\n", __FUNCTION__, nanonet_error_tostring(r));
 		return false;
 	} else
 		return true;
@@ -99,7 +77,7 @@ struct addrinfo * make_addrinfo(char const * host, char const * port) {
 	struct addrinfo hint=make_hint(AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP);
 	int err=getaddrinfo(host, port, &hint, &res);
 	if (err) {
-		fprintf(stderr, "getaddrinfo failed <%d>\n", WSAGetLastError());
+		fprintf(stderr, "getaddrinfo failed <%d>\n", nanonet_error());
 		return NULL;
 	}
 	return res;
@@ -111,7 +89,7 @@ bool setnameinfo(struct sockaddr const * addr, socklen_t len, char * host, char 
 		, port, NI_MAXSERV
 		, NI_NUMERICHOST | NI_NUMERICSERV))
 	{
-		fprintf(stderr, "getnameinfo failed <%d>\n", WSAGetLastError());
+		fprintf(stderr, "getnameinfo failed <%d>\n", nanonet_error());
 		return false;
 	} else
 		return true;
@@ -152,23 +130,23 @@ socket_t server_socket (char const * host, char const * port) {
 		printf("server_socket [%s:%s]\n", hostname, portname);
 		sock=socket(info->ai_family, info->ai_socktype, info->ai_protocol);
 		if (sock==INVALID_SOCKET) {
-			fprintf(stderr, "socket failed <%d>\n", WSAGetLastError());
+			fprintf(stderr, "socket failed <%d>\n", nanonet_error());
 			goto END;
 		}
 		if (bind(sock, info->ai_addr, info->ai_addrlen)) {
-			fprintf(stderr, "bind failed <%d>\n", WSAGetLastError());
+			fprintf(stderr, "bind failed <%d>\n", nanonet_error());
 			close_socket_t(sock);
 			sock=INVALID_SOCKET;
 			goto END;
 		}
 		if (listen(sock, SOMAXCONN)) {
-			fprintf(stderr, "listen failed <%d>\n", WSAGetLastError());
+			fprintf(stderr, "listen failed <%d>\n", nanonet_error());
 			close_socket_t(sock);
 			sock=INVALID_SOCKET;
 			goto END;
 		}
 	} else
-		fprintf(stderr, "make_addrinfo failed <%d>\n", WSAGetLastError());
+		fprintf(stderr, "make_addrinfo failed <%d>\n", nanonet_error());
 END:
 	freeaddrinfo(info);
 	return sock;
@@ -185,17 +163,17 @@ socket_t client_socket (char const * host, char const * port) {
 		printf("[%s:%s]\n", hostname, portname);
 		sock=socket(info->ai_family, info->ai_socktype, info->ai_protocol);
 		if (sock==INVALID_SOCKET) {
-			fprintf(stderr, "socket failed <%d>\n", WSAGetLastError());
+			fprintf(stderr, "socket failed <%d>\n", nanonet_error());
 			goto END;
 		}
 		if (connect(sock, info->ai_addr, info->ai_addrlen)==INVALID_SOCKET) {
-			fprintf(stderr, "connect failed <%d>\n", WSAGetLastError());
+			fprintf(stderr, "connect failed <%d>\n", nanonet_error());
 			close_socket_t(sock);
 			sock=INVALID_SOCKET;
 			goto END;
 		}
 	} else
-		fprintf(stderr, "make_addrinfo failed <%d>\n", WSAGetLastError());
+		fprintf(stderr, "make_addrinfo failed <%d>\n", nanonet_error());
 END:
 	freeaddrinfo(info);
 	return sock;
@@ -210,7 +188,7 @@ bool servline(socket_t sock, char * buff, size_t size, bool (*serv)(socket_t, ch
 			// connection have been gracefully closed
 			return false;
 		} else if (len<0) {
-			fprintf(stderr, "recv failed <%d>\n", WSAGetLastError());
+			fprintf(stderr, "recv failed <%d>\n", nanonet_error());
 			return false;
 		} else {
 			buff[len]='\0';
@@ -261,7 +239,7 @@ socket_t vsingle_accept(socket_t sock, bool (*serv)(socket_t, va_list), ...) {
 		int len=sizeof(addr);
 		socket_t acc=accept(sock, (struct sockaddr*)&addr, &len);
 		if (acc==INVALID_SOCKET) {
-			fprintf(stderr, "accept failed <%d>\n", WSAGetLastError());
+			fprintf(stderr, "accept failed <%d>\n", nanonet_error());
 		} else {
 			char * hostport = getnameinfo_as_string((struct sockaddr const*)&addr, len);
 			printf("accept [%s] <- [%s:%d]\n", hostport
@@ -288,7 +266,7 @@ socket_t single_accept(socket_t sock, bool (*serv)(socket_t)) {
 		int len=sizeof(addr);
 		socket_t acc=accept(sock, (struct sockaddr*)&addr, &len);
 		if (acc==INVALID_SOCKET) {
-			fprintf(stderr, "accept failed <%d>\n", WSAGetLastError());
+			fprintf(stderr, "accept failed <%d>\n", nanonet_error());
 		} else {
 			char * hostport = getnameinfo_as_string((struct sockaddr const*)&addr, len);
 			printf("accept [%s] <- [%s:%d]\n", hostport

@@ -27,14 +27,6 @@
 #include <assert.h>
 #include <net/state.h>
 
-
-#if !defined _WIN32
-static int WSAGetLastError(void) {
-	return errno;
-}
-#endif
-
-
 st_service_tuple make_st_service(SERVICE_ST_TYPE st, service_type serv) {
 	st_service_tuple sts;
 	sts.state = st;
@@ -123,7 +115,7 @@ bool state_machine_service(socket_t sock, service_type start_service
 		if (len==0) { // connection have been gracefully closed
 			break;
 		} else if (len<0) {
-			fprintf(stderr, "recv failed <%d>\n", WSAGetLastError());
+			fprintf(stderr, "recv failed <%d>\n", nanonet_error());
 			break;
 		} else {
 			st_service_tuple st;
