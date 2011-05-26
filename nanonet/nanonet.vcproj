@@ -58,6 +58,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="$(ProjectDir)\..\lib\$(ProjectName)_dbg.lib"
 			/>
 			<Tool
@@ -120,6 +121,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="$(ProjectDir)\..\lib\$(ProjectName).lib"
 			/>
 			<Tool
