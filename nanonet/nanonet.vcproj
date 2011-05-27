@@ -150,6 +150,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\src\log.c"
+				>
+			</File>
+			<File
 				RelativePath="..\src\net.c"
 				>
 			</File>
@@ -165,6 +169,10 @@
 			>
 			<File
 				RelativePath="..\include\bool.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\net\log.h"
 				>
 			</File>
 			<Filter
