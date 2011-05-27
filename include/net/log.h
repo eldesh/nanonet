@@ -62,12 +62,13 @@ typedef enum { NANONET_LOG_STDOUT
 } NANONET_LOG_TYPE;
 
 extern NANONET_LOG_TYPE nanonet_log_type; // output destination
-extern const size_t LOG_MSG_BUFF_SIZE;
+extern size_t const LOG_MSG_BUFF_SIZE;
 
 // use in macros, you should not call these functions directly.
 int nanolog_impl (const char * file, const int line, const char * func, const char * format, ...);
 int nanolog_impl2(const char * format, ...);
 char const * nanolog_tail (size_t n, char const * const string);
+int nanolog_dummy(const char * dummy, ...);
 
 #endif    /* NANONET_LOG_INCLUDED */
 
@@ -83,7 +84,7 @@ char const * nanolog_tail (size_t n, char const * const string);
 #if defined NANONET_LOG_ENABLE
 #  undef  NANOLOG
 #  if defined VARIADIC_MACRO_ENABLE
-#    define NANOLOG(...)                                                            \
+#    define NANOLOG(...)                                                                  \
 	     nanolog_impl( nanolog_tail(LOG_MSG_PATH_MAX_LENGTH    ,__FILE__) , __LINE__      \
                      , nanolog_tail(LOG_MSG_FUNCNAME_MAX_LENGTH,FUNC_NAME), __VA_ARGS__)
 #  else
@@ -118,3 +119,5 @@ char const * nanolog_tail (size_t n, char const * const string);
 #    define NANOVLOG(dummy)
 #  endif
 #endif // NANONET_LOG_ENABLE
+
+
