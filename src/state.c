@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <net/state.h>
+#include <net/log.h>
 
 st_service_tuple make_st_service(SERVICE_ST_TYPE st, service_type serv) {
 	st_service_tuple sts;
@@ -115,7 +116,7 @@ bool state_machine_service(socket_t sock, service_type start_service
 		if (len==0) { // connection have been gracefully closed
 			break;
 		} else if (len<0) {
-			fprintf(stderr, "recv failed <%d>\n", nanonet_error());
+			NANOLOG("recv failed <%d>\n", nanonet_error());
 			break;
 		} else {
 			st_service_tuple st;
@@ -128,10 +129,10 @@ bool state_machine_service(socket_t sock, service_type start_service
 			} else if (st.state==ST_END) {
 				break;
 			} else if (st.state==ST_INVALID) {
-				fprintf(stderr, "invalid state\n");
+				NANOLOG("invalid state\n");
 				break;
 			} else {
-				fprintf(stderr, "state machine occured fatal error with transition to unknown state XD\n");
+				NANOLOG("state machine occured fatal error with transition to unknown state XD\n");
 				assert(false);
 			}
 		}
