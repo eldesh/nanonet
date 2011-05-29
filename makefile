@@ -3,6 +3,7 @@ LIB = libnanonet.a
 
 .PHONY: $(LIB)
 $(LIB):
+	mkdir -p lib
 	$(MAKE) -C src
 
 .PHONY: test
