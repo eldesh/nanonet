@@ -76,22 +76,22 @@ int nanolog_impl2(const char * format, ...) {
 }
 
 static int vprint_msg_debugview (char const * format, va_list ap) {
+#if defined _WIN32
 	size_t const len = strlen(format)+256;
 	char * buff = (char*)calloc(len, sizeof(char));
 	int ret=vsnprintf(buff, len, format, ap);
 	OutputDebugString(buff);
 	free(buff);
 	return ret;
+#else
+	return vfprintf(stderr, format, ap);
+#endif
 }
 static int print_msg_debugview (char const * format, ...) {
 	int ret;
 	va_list ap;
-	va_start(format, ap);
-#if defined _WIN32
+	va_start(ap, format);
 	ret=vprint_msg_debugview(format, ap);
-#else
-	ret=vprintf(format, ap);
-#endif // _WIN32
 	va_end(ap);
 	return ret;
 }
