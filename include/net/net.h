@@ -98,6 +98,10 @@ uint16_t host_to_net_uint16_t(uint16_t x);
 
 fd_set make_fd_set(void);
 
+// When using the recv function,
+// if no data arrives during the period specified in timeval, recv_timeout function completes.
+int recv_timeout(socket_t sock, char * buffer, int len, int flags, struct timeval timeout);
+
 socket_t  single_accept(socket_t sock, bool (*serv)(socket_t));
 socket_t vsingle_accept(socket_t sock, bool (*serv)(socket_t, va_list), ...);
 

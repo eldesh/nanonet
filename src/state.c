@@ -83,6 +83,19 @@ int recv_buffer(socket_t sock, buffer * buff, int flags) {
 		buff->used += len;
 	return len;
 }
+int recv_buffer_timeout(socket_t sock, buffer * buff, int flags, struct timeval timeout) {
+	int len=recv_timeout(sock, &buff->buffer[buff->used], buff->size-buff->used, flags, timeout);
+	if (0<len)
+		buff->used += len;
+	return len;
+}
+
+static struct timeval timeval_from_sec(int sec) {
+	struct timeval time;
+	time.tv_sec = sec;
+	time.tv_usec = 0;
+	return time;
+}
 
 bool state_machine_service(socket_t sock, service_type start_service
 						                , void * ctx
@@ -91,6 +104,7 @@ bool state_machine_service(socket_t sock, service_type start_service
 	buffer buff = make_buffer(0);
 	service_type service = start_service;
 	buffer_slice bs = make_buffer_slice(buff.buffer, buff.used);
+	st_service_tuple st = make_st_service(ST_INVALID, NULL);
 	if (sock==INVALID_SOCKET)
 		return false;
 	while (1) {
@@ -112,14 +126,17 @@ bool state_machine_service(socket_t sock, service_type start_service
 		delete_buffer(&buff);
 		buff = newbuff;
 
-		len=recv_buffer(sock, &buff, 0);
+		if (st.state==ST_SHORT || buff.used==0)
+			len=recv_buffer(sock, &buff, 0);
+		else if (st.state==ST_TRANSITION)
+			len=recv_buffer_timeout(sock, &buff, 0, timeval_from_sec(1));
+
 		if (len==0) { // connection have been gracefully closed
 			break;
-		} else if (len<0) {
+		} else if (len==SOCKET_ERROR) {
 			NANOLOG("recv failed <%d>\n", nanonet_error());
 			break;
 		} else {
-			st_service_tuple st;
 			bs = make_buffer_slice(buff.buffer, buff.used);
 			st = service(&ctx, &bs);
 			if (st.state==ST_SHORT) {	// not enough inputted sequence

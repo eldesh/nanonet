@@ -240,6 +240,24 @@ uint16_t host_to_net_uint16_t(uint16_t x) {
 	return htons(x);
 }
 
+
+int recv_timeout(socket_t sock, char * buffer, int len, int flags, struct timeval timeout) {
+	fd_set fds = make_fd_set();
+	FD_SET(sock, &fds);
+	switch (select(sock+1, &fds, NULL, NULL, &timeout)) {
+	case -1:
+		NANOLOG("select <%s>\n", nanonet_error_tostring(nanonet_error()));
+		break;
+	case 0: // timed out
+		return -2;
+	default:
+		if (FD_ISSET(sock, &fds))
+			return recv(sock, buffer, len, flags);
+		break;
+	}
+	return SOCKET_ERROR;
+}
+
 socket_t vsingle_accept(socket_t sock, bool (*serv)(socket_t, va_list), ...) {
 	bool r;
 	if (sock==INVALID_SOCKET)

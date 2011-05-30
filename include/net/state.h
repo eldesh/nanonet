@@ -74,5 +74,6 @@ void delete_buffer(buffer * buff);
 void copy_buffer(buffer src, buffer * dst);
 void copy_slice_to_buffer(buffer_slice src, buffer * dst);
 int recv_buffer(socket_t sock, buffer * buff, int flags);
+int recv_buffer_timeout(socket_t sock, buffer * buff, int flags, struct timeval timeout);
 
 #endif    /* SERVICE_STATE_MACHINE_INCLUDED */
