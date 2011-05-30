@@ -31,7 +31,7 @@
 
 NANONET_LOG_TYPE nanonet_log_type = NANONET_LOG_DEBUGVIEW;
 
-static size_t const LOG_MSG_BUFF_SIZE = 1024;
+size_t const LOG_MSG_BUFF_SIZE = 1024;
 
 static
 int print_msg_impl( const char * file, const int line
