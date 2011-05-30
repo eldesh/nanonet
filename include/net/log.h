@@ -118,4 +118,3 @@ char const * nanolog_tail (size_t n, char const * const string);
 #    define NANOVLOG(dummy)
 #  endif
 #endif // NANONET_LOG_ENABLE
-

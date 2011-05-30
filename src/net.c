@@ -134,6 +134,15 @@ socket_t server_socket (char const * host, char const * port) {
 			NANOLOG("socket failed <%d>\n", nanonet_error());
 			goto END;
 		}
+		{
+			char const enable  = '1';
+			if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int))==SOCKET_ERROR) {
+				NANOLOG("setsockopt <%s>\n", nanonet_error_tostring(nanonet_error()));
+				close_socket_t(sock);
+				sock=INVALID_SOCKET;
+				goto END;
+			}
+		}
 		if (bind(sock, info->ai_addr, info->ai_addrlen)) {
 			NANOLOG("bind failed <%d>\n", nanonet_error());
 			close_socket_t(sock);

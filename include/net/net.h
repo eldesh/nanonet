@@ -46,6 +46,7 @@
 #  include <inttypes.h>
   typedef int    socket_t;
 #  define INVALID_SOCKET  (socket_t)(~0)
+#  define SOCKET_ERROR    (-1)
 #endif
 #include <stdarg.h>
 #include "bool.h"
