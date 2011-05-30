@@ -58,8 +58,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nanonet.lib"
+				AdditionalDependencies="nanonet_dbg.lib"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\lib&quot;"
+				IgnoreAllDefaultLibraries="false"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -131,6 +132,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="nanonet.lib"
 				AdditionalLibraryDirectories="$(SolutionDir)..\lib"
+				IgnoreAllDefaultLibraries="false"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
