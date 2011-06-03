@@ -226,7 +226,14 @@ bool sendall(socket_t sock, char const * buf, size_t len, int flags) {
 	return true;
 }
 
-
+bool senduint32(socket_t sock, uint32_t val, int flags) {
+	char intbuff[4];
+	*((int32_t*)intbuff) = host_to_net_uint32_t(val);
+//	for (i=0; i<4; ++i)
+//		dst[i] = (byte)(val >> (24-8*i));
+	return sendall(sock, intbuff, 4, flags);
+}
+	
 uint32_t net_to_host_uint32_t(uint32_t x) {
 	return ntohl(x);
 }
