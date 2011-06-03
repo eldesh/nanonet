@@ -89,6 +89,7 @@ bool close_socket_t(socket_t soc);
 bool servline(socket_t sock, char * buff, size_t size, bool (*serv)(socket_t, char const *, size_t));
 
 bool sendall(socket_t sock, char const * buf, size_t len, int flags);
+bool senduint32(socket_t sock, uint32_t val, int flags);
 
 // exchange byte order
 uint32_t net_to_host_uint32_t(uint32_t x);
