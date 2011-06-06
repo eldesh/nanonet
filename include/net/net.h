@@ -102,6 +102,7 @@ fd_set make_fd_set(void);
 // When using the recv function,
 // if no data arrives during the period specified in timeval, recv_timeout function completes.
 int recv_timeout(socket_t sock, char * buffer, int len, int flags, struct timeval timeout);
+int recvuint32(socket_t sock, uint32_t * val, int flags);
 
 socket_t  single_accept(socket_t sock, bool (*serv)(socket_t));
 socket_t vsingle_accept(socket_t sock, bool (*serv)(socket_t, va_list), ...);
