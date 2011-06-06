@@ -233,7 +233,7 @@ bool senduint32(socket_t sock, uint32_t val, int flags) {
 //		dst[i] = (byte)(val >> (24-8*i));
 	return sendall(sock, intbuff, 4, flags);
 }
-	
+
 uint32_t net_to_host_uint32_t(uint32_t x) {
 	return ntohl(x);
 }

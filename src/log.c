@@ -28,6 +28,7 @@
 #include <stdlib.h>
 
 #include <net/log.h>
+#include <bool.h>
 
 NANONET_LOG_TYPE nanonet_log_type = NANONET_LOG_DEBUGVIEW;
 
@@ -58,23 +59,6 @@ int nanolog_impl( const char * file, const int line
 
 int nanolog_dummy(const char * dummy, ...) {  return 0;  }
 
-int nanolog_impl2(const char * format, ...) {
-	// this is used when platform unsuport variadic macro
-	int result=-1;
-	char * msg_buffer = (char*)malloc(sizeof(char)*(LOG_MSG_BUFF_SIZE+strlen(format)+1));
-	va_list ap;
-
-	sprintf(msg_buffer, "[NANOLOG] ");             // add log header to string
-	strcpy(msg_buffer+strlen(msg_buffer), format); // concatenate specified format
-
-	va_start(ap, format);
-	result = vfprintf(stderr, msg_buffer, ap); // pass the format string to standard function
-	va_end(ap);
-
-	free(msg_buffer);
-	return result;
-}
-
 static int vprint_msg_debugview (char const * format, va_list ap) {
 #if defined _WIN32
 	size_t const len = strlen(format)+256;
@@ -87,14 +71,40 @@ static int vprint_msg_debugview (char const * format, va_list ap) {
 	return vfprintf(stderr, format, ap);
 #endif
 }
-static int print_msg_debugview (char const * format, ...) {
+
+// output formatted string to there along the logtype 
+static int nanolog_vprintf(char const * format, va_list ap) {
 	int ret;
-	va_list ap;
-	va_start(ap, format);
-	ret=vprint_msg_debugview(format, ap);
-	va_end(ap);
+	if (nanonet_log_type==NANONET_LOG_DEBUGVIEW)
+		ret = vprint_msg_debugview(format, ap);
+	else if (nanonet_log_type==NANONET_LOG_STDERR)
+		ret = vfprintf(stderr, format, ap);	// pass the format string to standard function
+	else if (nanonet_log_type==NANONET_LOG_STDOUT)
+		ret = vfprintf(stdout, format, ap);	// pass the format string to standard function
+	else {
+		assert(false); // unknown log type specified
+	}
 	return ret;
 }
+
+int nanolog_impl2(const char * format, ...) {
+	if (nanonet_log_type==NANONET_LOG_OFF)
+		return 0;
+	{
+		// this is used when platform unsuport variadic macro
+		int ret=-1;
+		char * msg_buffer = (char*)malloc(sizeof(char)*(LOG_MSG_BUFF_SIZE+strlen(format)+1));
+		va_list ap;
+		sprintf(msg_buffer, "[NANOLOG] ");             // add log header to string
+		strcpy(msg_buffer+strlen(msg_buffer), format); // concatenate specified format
+		va_start(ap, format);
+		ret=nanolog_vprintf(msg_buffer, ap);
+		va_end(ap);
+		free(msg_buffer);
+		return ret;
+	}
+}
+
 
 static int print_msg_impl( const char * file, const int line
 						 , const char * func, const char * header, const char * format, va_list ap)
@@ -110,17 +120,7 @@ static int print_msg_impl( const char * file, const int line
 			"%-" PP_TOSTRING(LOG_MSG_FUNCNAME_MAX_LENGTH) "s> "   \
 			, header, file, line, func);
 		strcpy(msg_buffer+strlen(msg_buffer), format);
-
-		// sort output destination
-		if (nanonet_log_type==NANONET_LOG_DEBUGVIEW) {
-			result = vprint_msg_debugview(msg_buffer, ap);
-		} else if (nanonet_log_type==NANONET_LOG_STDERR) {
-			result = vfprintf(stderr, msg_buffer, ap);
-		} else if (nanonet_log_type==NANONET_LOG_STDOUT) {
-			result = vfprintf(stdout, msg_buffer, ap);
-		} else {
-			assert(0);
-		}
+		result = nanolog_vprintf(msg_buffer, ap);
 		free(msg_buffer);
 		return result;
 	}
