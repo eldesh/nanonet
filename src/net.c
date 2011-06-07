@@ -265,13 +265,29 @@ int recv_timeout(socket_t sock, char * buffer, int len, int flags, struct timeva
 	return SOCKET_ERROR;
 }
 
-int recvuint32(socket_t sock, uint32_t * val, int flags) {
+uint32_t recvuint32(socket_t sock, uint32_t * val, int flags) {
 	uint32_t x;
 	int r=recv(sock, (char*)&x, 4, flags);
 	*val = net_to_host_uint32_t(x);
 	return r;
 }
 
+int recv_all(socket_t sock, char * buffer, int len, int flags) {
+	return recv(sock, buffer, len, flags | MSG_WAITALL);
+}
+
+int recv_buffer(socket_t sock, buffer * buff, int flags) {
+	int len=recv(sock, &buff->buffer[buff->used], buff->size-buff->used, flags);
+	if (0<len)
+		buff->used += len;
+	return len;
+}
+int recv_buffer_timeout(socket_t sock, buffer * buff, int flags, struct timeval timeout) {
+	int len=recv_timeout(sock, (char*)&buff->buffer[buff->used], buff->size-buff->used, flags, timeout);
+	if (0<len)
+		buff->used += len;
+	return len;
+}
 
 socket_t vsingle_accept(socket_t sock, bool (*serv)(socket_t, va_list), ...) {
 	bool r;

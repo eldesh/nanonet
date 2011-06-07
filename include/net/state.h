@@ -26,6 +26,7 @@
 #define      SERVICE_STATE_MACHINE_INCLUDED
 
 #include <net/net.h>
+#include <buffer.h>
 
 typedef enum {
 	  ST_TRANSITION  // occur transition go to other state
@@ -34,17 +35,6 @@ typedef enum {
 	, ST_SHORT       // given buffer is too short for parsing
 	, ST_NONE
 } SERVICE_ST_TYPE;
-
-typedef struct buffer_ {
-	int size; // not size_t for using return value of recv
-	int used; // used size
-	byte * buffer;
-} buffer;
-
-typedef struct buffer_slice_ {
-	size_t size;
-	byte const * buffer;
-} buffer_slice;
 
 struct st_service_tuple_;
 typedef struct st_service_tuple_ st_service_tuple;
@@ -68,12 +58,5 @@ bool state_machine_service(socket_t sock, service_type start_service
 										, void (*ctx_dtor)(void *));  // if NULL then use free(3) instead of this
 
 st_service_tuple make_st_service(SERVICE_ST_TYPE st, service_type serv);
-buffer make_buffer(int size);
-buffer_slice make_buffer_slice(byte const * buffer, size_t size);
-void delete_buffer(buffer * buff);
-void copy_buffer(buffer src, buffer * dst);
-void copy_slice_to_buffer(buffer_slice src, buffer * dst);
-int recv_buffer(socket_t sock, buffer * buff, int flags);
-int recv_buffer_timeout(socket_t sock, buffer * buff, int flags, struct timeval timeout);
 
 #endif    /* SERVICE_STATE_MACHINE_INCLUDED */

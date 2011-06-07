@@ -3,7 +3,7 @@
 CC      = gcc
 PROGRAM = ../lib/libnanonet.a
 CFLAGS  = -g -Wall -I ../include
-FILES   = net.o state.o log.o
+FILES   = net.o state.o log.o buffer.o
 OBJS    = $(FILES:%=../lib/%)
 SRCS    = $(OBJS:%.o=%.c)
 

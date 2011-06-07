@@ -49,6 +49,8 @@
 #  define SOCKET_ERROR    (-1)
 #endif
 #include <stdarg.h>
+
+#include <buffer.h>
 #include "bool.h"
 
 #if defined _WIN32
@@ -59,8 +61,6 @@
   typedef unsigned long  uint32_t;
   typedef unsigned short uint16_t;
   typedef unsigned char  uint8_t;
-#else
-  typedef char byte;
 #endif
 
 
@@ -102,7 +102,12 @@ fd_set make_fd_set(void);
 // When using the recv function,
 // if no data arrives during the period specified in timeval, recv_timeout function completes.
 int recv_timeout(socket_t sock, char * buffer, int len, int flags, struct timeval timeout);
-int recvuint32(socket_t sock, uint32_t * val, int flags);
+// recv blocking until length of data reaches to specified length.
+// currently, `flags` will be used by bitwise OR with the platform native WAIT flag
+int recv_all(socket_t sock, char * buffer, int len, int flags);
+uint32_t recvuint32(socket_t sock, uint32_t * val, int flags);
+int recv_buffer(socket_t sock, buffer * buff, int flags);
+int recv_buffer_timeout(socket_t sock, buffer * buff, int flags, struct timeval timeout);
 
 socket_t  single_accept(socket_t sock, bool (*serv)(socket_t));
 socket_t vsingle_accept(socket_t sock, bool (*serv)(socket_t, va_list), ...);
