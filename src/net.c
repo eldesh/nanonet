@@ -32,6 +32,13 @@
 #include <net/net.h>
 #include <net/log.h>
 
+#if defined _WIN32
+#  include <io.h>
+#  include <Mswsock.h>
+#elif defined __linux__
+#  include <sys/sendfile.h>
+#endif
+
 char const * nanonet_error_tostring (int err) {
 	return strerror(err);
 }
@@ -232,6 +239,51 @@ bool senduint32(socket_t sock, uint32_t val, int flags) {
 //	for (i=0; i<4; ++i)
 //		dst[i] = (byte)(val >> (24-8*i));
 	return sendall(sock, intbuff, 4, flags);
+}
+
+#if defined __linux__
+static int sendfile_generic(socket_t sock, int fd, off_t * offset, size_t count) {
+	char * buff=(char*)calloc(count, sizeof(char));
+	int sum=0;
+	do {
+		ssize_t r;
+		if (offset)		r= read(fd, buff, count-sum);
+		else			r=pread(fd, buff, count-sum, *offset +sum);
+		if (r==-1) {
+			NANOLOG("failed <%s>\n", nanonet_error_tostring(nanonet_error()));
+			sum=INVALID_SOCKET;
+			break;
+		}
+		if (r==0) // read gracefuly finished
+			break;
+		sum += r;
+		if (offset)
+			*offset = *offset + r;
+		if (sendall(sock, buff, r, 0)==INVALID_SOCKET) {
+			NANOLOG("failed <%s>\n", nanonet_error_tostring(nanonet_error()));
+			sum=INVALID_SOCKET;
+			break;
+		}
+	} while (sum<count);
+	free(buff);
+	return sum;
+}
+#endif // __linux__
+
+bool send_file(socket_t sock, FILE * fp, size_t size, int flags) {
+#if defined _WIN32
+	HANDLE h = (HANDLE)_get_osfhandle(_fileno(fp));
+	if (!TransmitFile(sock, h, size, 0, NULL, NULL, 0)) {
+#elif defined  __linux__
+	int fd = fileno(fp);
+	if (sendfile(sock, fd, NULL, size)==INVALID_SOCKET) {
+#else
+	if (sendfile_generic(sock, fd, NULL, size)==INVALID_SOCKET) {
+#endif
+		NANOLOG("failed <%s>\n", nanonet_error_tostring(nanonet_error()));
+		return false;
+	}
+	return true;
 }
 
 uint32_t net_to_host_uint32_t(uint32_t x) {

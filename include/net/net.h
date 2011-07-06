@@ -91,6 +91,8 @@ bool servline(socket_t sock, char * buff, size_t size, bool (*serv)(socket_t, ch
 bool sendall(socket_t sock, char const * buf, size_t len, int flags);
 bool senduint32(socket_t sock, uint32_t val, int flags);
 
+bool send_file(socket_t sock, FILE * fp, size_t size, int flags);
+
 // exchange byte order
 uint32_t net_to_host_uint32_t(uint32_t x);
 uint16_t net_to_host_uint16_t(uint16_t x);
