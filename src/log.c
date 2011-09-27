@@ -82,7 +82,7 @@ static int nanolog_vprintf(char const * format, va_list ap) {
 	else if (nanonet_log_type==NANONET_LOG_STDOUT)
 		ret = vfprintf(stdout, format, ap);	// pass the format string to standard function
 	else {
-		assert(false); // unknown log type specified
+		assert(false); // unknown log type is specified
 	}
 	return ret;
 }
