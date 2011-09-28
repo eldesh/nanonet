@@ -241,7 +241,7 @@ bool senduint32(socket_t sock, uint32_t val, int flags) {
 	return sendall(sock, intbuff, 4, flags);
 }
 
-#if defined __linux__
+#if defined __CYGWIN__
 static int sendfile_generic(socket_t sock, int fd, off_t * offset, size_t count) {
 	char * buff=(char*)calloc(count, sizeof(char));
 	int sum=0;
@@ -268,7 +268,7 @@ static int sendfile_generic(socket_t sock, int fd, off_t * offset, size_t count)
 	free(buff);
 	return sum;
 }
-#endif // __linux__
+#endif
 
 bool send_file(socket_t sock, FILE * fp, size_t size, int flags) {
 #if defined _WIN32
@@ -277,8 +277,11 @@ bool send_file(socket_t sock, FILE * fp, size_t size, int flags) {
 #elif defined  __linux__
 	int fd = fileno(fp);
 	if (sendfile(sock, fd, NULL, size)==INVALID_SOCKET) {
-#else
+#elif defined __CYGWIN__
+	int fd = fileno(fp);
 	if (sendfile_generic(sock, fd, NULL, size)==INVALID_SOCKET) {
+#else
+	if (1) {
 #endif
 		NANOLOG("failed <%s>\n", nanonet_error_tostring(nanonet_error()));
 		return false;
