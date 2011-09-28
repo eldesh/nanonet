@@ -15,8 +15,8 @@ ${PROGRAM}:$(OBJS)
 	$(CC) $(CFLAGS) -o ../lib/$*.o -c $<
 
 clean:
-	rm $(OBJS)
-	rm $(PROGRAM)
+	rm -f $(OBJS)
+	rm -f $(PROGRAM)
 
 
 

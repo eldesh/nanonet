@@ -27,8 +27,6 @@
  * small LOG utility
  *
  *   switch NANONET_LOG_ENABLE macro, then include this from .c file.
- *
- *
  */
 #if !defined NANONET_LOG_INCLUDED
 #define      NANONET_LOG_INCLUDED

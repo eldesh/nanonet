@@ -9,5 +9,5 @@ $(PROGRAM): src/test.c
 	$(CC) $(CFLAGS) -o $@ $< $(LIB)
 
 clean:
-	rm test
+	rm -f test
 

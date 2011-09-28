@@ -7,7 +7,7 @@ $(LIB):
 	$(MAKE) -C src
 
 .PHONY: test
-test:
+test: $(LIB)
 	$(MAKE) -C test
 
 .PHONY: clean

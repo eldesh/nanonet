@@ -15,7 +15,7 @@ int main () {
 	nanonet_log_type = NANONET_LOG_DEBUGVIEW;
 	NANOLOG("message to debugview\n");
 	nanonet_log_type = NANONET_LOG_OFF;
-	NANOLOG("message to space...?\n");
+	NANOLOG("message to the space...?\n");
 	nanonet_log_type = NANONET_LOG_DEBUGVIEW;
 	NANOLOG("nanonet test complete!\n");
 	return 0;
