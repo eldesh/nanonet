@@ -74,15 +74,17 @@ struct addrinfo make_hint(int family, int type, int protocol) {
 #else
 	memset(&hint, 0, sizeof(hint));
 #endif
-	hint.ai_family   = AF_UNSPEC;
-	hint.ai_socktype = SOCK_STREAM;
-	hint.ai_protocol = IPPROTO_TCP;
+	hint.ai_family   = family;
+	hint.ai_socktype = type;
+	hint.ai_protocol = protocol;
 	return hint;
 }
 
 struct addrinfo * make_addrinfo(char const * host, char const * port) {
 	struct addrinfo * res=NULL;
-	struct addrinfo hint=make_hint(AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP);
+// IPv6 will be choiced by default @Win7
+//	struct addrinfo hint=make_hint(AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP);
+	struct addrinfo hint=make_hint(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	int err=getaddrinfo(host, port, &hint, &res);
 	if (err) {
 		NANOLOG("getaddrinfo failed <%d>\n", nanonet_error());
