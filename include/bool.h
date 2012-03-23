@@ -25,12 +25,14 @@
 #if !defined BOOL_INCLUDED
 #define      BOOL_INCLUDED
 
-#if defined _WIN32
+#if !defined __cplusplus
+#  if defined _WIN32
 typedef enum {false=0, true} bool;
-#else
+#  else
 //#  include <stdbool.h>
 //typedef _Bool bool;
 typedef enum {false=0, true} bool;
-#endif
+#  endif
+#endif // __cplusplus
 
 #endif    /* BOOL_INCLUDED */

@@ -53,7 +53,7 @@
 #include <buffer.h>
 #include "bool.h"
 
-#if defined _WIN32
+#if defined _WIN32 && !defined __cplusplus
   typedef          int   int32_t;
   typedef   signed short int16_t;
   typedef          char  int8_t;
