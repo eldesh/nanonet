@@ -356,6 +356,7 @@ socket_t vsingle_accept(socket_t sock, bool (*serv)(socket_t, va_list), ...) {
 		socket_t acc=accept(sock, (struct sockaddr*)&addr, &len);
 		if (acc==INVALID_SOCKET) {
 			NANOLOG("accept failed <%d>\n", nanonet_error());
+			r=false;
 		} else {
 			char * hostport = getnameinfo_as_string((struct sockaddr const*)&addr, len);
 			NANOLOG("accept [%s] <- [%s:%d]\n", hostport
@@ -383,6 +384,7 @@ socket_t single_accept(socket_t sock, bool (*serv)(socket_t)) {
 		socket_t acc=accept(sock, (struct sockaddr*)&addr, &len);
 		if (acc==INVALID_SOCKET) {
 			NANOLOG("accept failed <%d>\n", nanonet_error());
+			r=false;
 		} else {
 			char * hostport = getnameinfo_as_string((struct sockaddr const*)&addr, len);
 			NANOLOG("accept [%s] <- [%s:%d]\n", hostport
