@@ -29,6 +29,7 @@
 #  define _CRT_SECURE_NO_WARNINGS
 #  include <winsock2.h>
 #  include <ws2tcpip.h>
+#  include <stdint.h>
   typedef SOCKET socket_t;
 #else
 #  include <sys/param.h>
@@ -52,17 +53,6 @@
 
 #include <buffer.h>
 #include "bool.h"
-
-#if defined _WIN32 && !defined __cplusplus
-  typedef          int   int32_t;
-  typedef   signed short int16_t;
-  typedef          char  int8_t;
-  //typedef char byte;
-  typedef unsigned long  uint32_t;
-  typedef unsigned short uint16_t;
-  typedef unsigned char  uint8_t;
-#endif
-
 
 bool network_init(void); // initialize network subsystem
 void network_end(void);  // end network subsystem
