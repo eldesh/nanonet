@@ -15,12 +15,12 @@ bool recv_int_array_serv(socket_t soc) {
 			uint32_t v;
 			int r=recvuint32(soc, &v, 0);
 			if (r==0)
-				return true;
+				return false;
 			if (r<0) {
 				NANOLOG("recv failure\n");
 				return false;
 			}
-			printf("recved <%d>\n", v);
+			printf("[%3d] recved <%d>\n", r, v);
 			if (i%5==0)
 				NANOLOG("received %d integers!\n", i);
 		}

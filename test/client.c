@@ -12,7 +12,7 @@ int random_int(int from, int to) {
 	return from + rand()%range;
 }
 
-socket_t pass_int_array_serv(socket_t soc, int N) {
+socket_t pass_random_int_array_serv(socket_t soc, int N) {
 	if (soc!=INVALID_SOCKET) {
 		int i;
 		NANOLOG("send int array start!\n");
@@ -23,20 +23,37 @@ socket_t pass_int_array_serv(socket_t soc, int N) {
 			}
 		}
 		NANOLOG("send int array complete!\n");
-		return true;
+	}
+	return soc;
+}
+
+socket_t pass_int_array_serv(socket_t soc, int N) {
+	if (soc!=INVALID_SOCKET) {
+		int i;
+		NANOLOG("send int array start!\n");
+		for (i=0; i<N; ++i) {
+			char buff[36];
+			scanf("%s", buff);
+			printf("input[%d]\n", atoi(buff));
+			fflush(stdout);
+			if (!senduint32(soc, atoi(buff), 0)) {
+				NANOLOG("sendall failure\n");
+				return false;
+			}
+		}
+		NANOLOG("send int array complete!\n");
 	}
 	return soc;
 }
 
 int main (int argc, char * argv[]) {
 	nanonet_log_type = NANONET_LOG_STDERR;
-	int const N = 1<argc ? atoi(argv[1]) : 10;
 	NANOLOG("start\n");
 	close_socket_t
 	  (pass_int_array_serv
 	      (client_socket
-		    ("localhost", "5555")
-		, N));
+		    ("localhost", 1<argc ? argv[1] : "5555")
+		, 10));
 	NANOLOG("end..\n");
 	return 0;
 }
