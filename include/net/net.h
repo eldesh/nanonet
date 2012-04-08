@@ -29,8 +29,10 @@
 #  define _CRT_SECURE_NO_WARNINGS
 #  include <winsock2.h>
 #  include <ws2tcpip.h>
+#  include <BaseTsd.h>
 #  include <stdint.h>
   typedef SOCKET socket_t;
+  typedef SSIZE_T ssize_t;
 #else
 #  include <sys/param.h>
 #  include <sys/socket.h>
@@ -97,7 +99,7 @@ int recv_timeout(socket_t sock, char * buffer, int len, int flags, struct timeva
 // recv blocking until length of data reaches to specified length.
 // currently, `flags` will be used by bitwise OR with the platform native WAIT flag
 int recv_all(socket_t sock, char * buffer, int len, int flags);
-uint32_t recvuint32(socket_t sock, uint32_t * val, int flags);
+ssize_t recvuint32(socket_t sock, uint32_t * val, int flags);
 int recv_buffer(socket_t sock, buffer * buff, int flags);
 int recv_buffer_timeout(socket_t sock, buffer * buff, int flags, struct timeval timeout);
 

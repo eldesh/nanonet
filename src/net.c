@@ -322,9 +322,9 @@ int recv_timeout(socket_t sock, char * buffer, int len, int flags, struct timeva
 	return SOCKET_ERROR;
 }
 
-uint32_t recvuint32(socket_t sock, uint32_t * val, int flags) {
+ssize_t recvuint32(socket_t sock, uint32_t * val, int flags) {
 	uint32_t x;
-	int r=recv(sock, (char*)&x, 4, flags);
+	ssize_t r=recv(sock, (char*)&x, 4, flags);
 	*val = net_to_host_uint32_t(x);
 	return r;
 }
