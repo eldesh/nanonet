@@ -352,7 +352,7 @@ socket_t vsingle_accept(socket_t sock, bool (*serv)(socket_t, va_list), ...) {
 		return sock;
 	do {
 		struct sockaddr_in addr;
-		int len=sizeof(addr);
+		socklen_t len = sizeof(addr);
 		socket_t acc=accept(sock, (struct sockaddr*)&addr, &len);
 		if (acc==INVALID_SOCKET) {
 			NANOLOG("accept failed <%d>\n", nanonet_error());
@@ -380,7 +380,7 @@ socket_t single_accept(socket_t sock, bool (*serv)(socket_t)) {
 		return sock;
 	do {
 		struct sockaddr_in addr;
-		int len=sizeof(addr);
+		socklen_t len=sizeof(addr);
 		socket_t acc=accept(sock, (struct sockaddr*)&addr, &len);
 		if (acc==INVALID_SOCKET) {
 			NANOLOG("accept failed <%d>\n", nanonet_error());
